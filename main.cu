@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <string>
+#include <vector>
 
 #include "cpu.hpp"
 
@@ -17,6 +18,11 @@ int main(int argc, char const *argv[]) {
   size_t pos;
   ULONGLONG x = stoll(argv[1],&pos);
   cout <<x<<endl;
-  cout<<"Is prime : "<<isPrimeCPU(x)<<endl;
+  cout<<"Is prime : "<<isPrimeCPUV1(x)<<endl;
+
+  vector<ULONGLONG> v = searchPrimesCPUV2(x);
+  for (ULONGLONG n : v) {
+        std::cout << n << ", ";
+    }
   return 0;
 }
