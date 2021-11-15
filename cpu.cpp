@@ -8,8 +8,10 @@ bool isPrimeCPUV1(const ULONGLONG N){
   return true;
 }
 
-bool isPrimeCPUV2(const ULONGLONG N,vector<ULONGLONG> v){
+bool isPrimeCPUV2(const ULONGLONG N,vector<ULONGLONG> &v){
   for(ULONGLONG x : v){
+    if(x > sqrt(N))
+      return true;
     if(N%x==0){
       return false;
     }
@@ -43,4 +45,22 @@ vector<ULONGLONG> searchPrimesCPUV2(const ULONGLONG N){
     }
   }
   return out;
+}
+
+void factoCPU(ULONGLONG N,vector<ULONGLONG> v,vector<Cell> &cells){
+  ULONGLONG tmp = N;
+  for(int i = 0;i<v.size() && tmp!=1;i++){
+    ULONGLONG val = v.at(i);
+    if(tmp%val==0){
+      Cell cell;
+      cell.expo = 0;
+      cell.value = val;
+      while(tmp%val==0){
+        cell.expo++;
+        tmp/=val;
+      }
+      cells.push_back(cell);
+    }
+  }
+
 }
