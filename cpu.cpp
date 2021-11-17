@@ -22,7 +22,7 @@ bool isPrimeCPUV2(const ULONGLONG N,vector<ULONGLONG> &v){
 
 vector<ULONGLONG> searchPrimesCPUV1(const ULONGLONG N){
   std::vector<ULONGLONG> out = {2};
-  for(ULONGLONG i=3;i<N;i++){
+  for(ULONGLONG i=3;i<=N;i++){
     bool isPrime = true;
     for(ULONGLONG x : out){
         if(i%x == 0){
@@ -39,7 +39,7 @@ vector<ULONGLONG> searchPrimesCPUV1(const ULONGLONG N){
 
 vector<ULONGLONG> searchPrimesCPUV2(const ULONGLONG N){
   vector<ULONGLONG> out = {2};
-  for(ULONGLONG i=3;i<N;i++){
+  for(ULONGLONG i=3;i<=N;i++){
     if(isPrimeCPUV2(i,out)){
       out.push_back(i);
     }
