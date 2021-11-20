@@ -65,6 +65,8 @@ int main(int argc, char const *argv[]) {
   timeGPU = chrGPU.elapsedTime();
   cout<<"--> Temps du test de primalité : "<<timeGPU<<" ms"<<endl;
   cout<<"Est premier ? "<<(isPrime?"Oui":"Non")<<endl;
-  v = searchPrimesGPUV1(x);
+  v = searchPrimesGPUV1Launcher(x,&chrGPU);
+  timeGPU = chrGPU.elapsedTime();
+  cout<<"--> Temps de recherche : "<<timeGPU<<" ms"<<endl;
   return 0;
 }
