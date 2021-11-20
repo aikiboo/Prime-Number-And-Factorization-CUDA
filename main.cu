@@ -23,16 +23,14 @@ int main(int argc, char const *argv[]) {
   ULONGLONG x = stoll(argv[1],&pos);
   ChronoGPU chrGPU;
 	ChronoCPU chrCPU;
+  float timeGPU;
 
   cout<<"======================================"<<endl;
   cout<<"\t Partie CPU sur le nombre "<<x<<endl;
   cout<<"======================================"<<endl;
   cout<<"Test de primalité de "<<x<<endl;
-	chrCPU.start();
   //Test x is prime
-  bool isPrime = isPrimeCPUV1(x);
-
-  chrCPU.stop();
+  bool isPrime = isPrimeCPUV1(x,&chrCPU);
   float timeCPU = chrCPU.elapsedTime();
   cout<<"--> Temps du test de primalité : "<<timeCPU<<" ms"<<endl;
   cout<<"Est premier ? "<<(isPrime?"Oui":"Non")<<endl;
@@ -64,8 +62,7 @@ int main(int argc, char const *argv[]) {
   cout<<"======================================"<<endl;
   cout<<"Test de primalité de "<<x<<endl;
   isPrime = isPrimeGPUlancherV1(x,&chrGPU);
-  timeCPU = chrCPU.elapsedTime();
-  float timeGPU = chrGPU.elapsedTime();
+  timeGPU = chrGPU.elapsedTime();
   cout<<"--> Temps du test de primalité : "<<timeGPU<<" ms"<<endl;
   cout<<"Est premier ? "<<(isPrime?"Oui":"Non")<<endl;
   v = searchPrimesGPUV1(x);

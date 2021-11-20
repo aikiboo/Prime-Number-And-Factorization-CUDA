@@ -1,10 +1,15 @@
 
 #include "cpu.hpp"
 
-bool isPrimeCPUV1(const ULONGLONG N){
+bool isPrimeCPUV1(const ULONGLONG N,ChronoCPU*chrCPU){
+  (*chrCPU).start();
   for(ULONGLONG i = 2;i<sqrt(N);i++){
-    if(N%i==0)return false;
+    if(N%i==0){
+      (*chrCPU).stop();
+      return false;
+    }
   }
+  (*chrCPU).stop();
   return true;
 }
 
