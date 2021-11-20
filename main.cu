@@ -47,7 +47,7 @@ int main(int argc, char const *argv[]) {
   //Factorization of x
   chrCPU.start();
   vector<Cell> cells ={};
-  factoCPU(x,v,cells);
+  factoCPU(x,&v,&cells);
   chrCPU.stop();
   timeCPU = chrCPU.elapsedTime();
 
@@ -68,5 +68,14 @@ int main(int argc, char const *argv[]) {
   v = searchPrimesGPUV1Launcher(x,&chrGPU);
   timeGPU = chrGPU.elapsedTime();
   cout<<"--> Temps de recherche : "<<timeGPU<<" ms"<<endl;
+  vector<Cell> cells_gpu ={};
+  factoCPU(x,&v,&cells_gpu);
+  timeGPU = chrGPU.elapsedTime();
+  cout<<"--> Temps de Factorisation : "<<timeGPU<<" ms"<<endl;
+  cout<<"Factorisation : 1";
+  for(Cell c : cells_gpu){
+    cout<<" * "<<c.value<<"^"<<c.expo;
+  }
+  cout<<endl;
   return 0;
 }

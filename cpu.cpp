@@ -52,10 +52,10 @@ vector<ULONGLONG> searchPrimesCPUV2(const ULONGLONG N){
   return out;
 }
 
-void factoCPU(ULONGLONG N,vector<ULONGLONG> v,vector<Cell> &cells){
+void factoCPU(ULONGLONG N,vector<ULONGLONG>* v,vector<Cell>* cells){
   ULONGLONG tmp = N;
-  for(int i = 0;i<v.size() && tmp!=1;i++){
-    ULONGLONG val = v.at(i);
+  for(int i = 0;i<v->size() && tmp!=1;i++){
+    ULONGLONG val = v->at(i);
     if(tmp%val==0){
       Cell cell;
       cell.expo = 0;
@@ -64,7 +64,7 @@ void factoCPU(ULONGLONG N,vector<ULONGLONG> v,vector<Cell> &cells){
         cell.expo++;
         tmp/=val;
       }
-      cells.push_back(cell);
+      cells->push_back(cell);
     }
   }
 
