@@ -3,7 +3,7 @@
 
 bool isPrimeCPUV1(const ULONGLONG N,ChronoCPU*chrCPU){
   (*chrCPU).start();
-  for(ULONGLONG i = 2;i<sqrt(N);i++){
+  for(ULONGLONG i = 2;i<=sqrt(N);i++){
     if(N%i==0){
       (*chrCPU).stop();
       return false;
@@ -44,7 +44,7 @@ vector<ULONGLONG> searchPrimesCPUV1(const ULONGLONG N){
 
 vector<ULONGLONG> searchPrimesCPUV2(const ULONGLONG N){
   vector<ULONGLONG> out = {2};
-  for(ULONGLONG i=3;i<=N;i++){
+  for(ULONGLONG i=3;i<=sqrt(N);i++){
     if(isPrimeCPUV2(i,out)){
       out.push_back(i);
     }
@@ -66,6 +66,12 @@ void factoCPU(ULONGLONG N,vector<ULONGLONG>* v,vector<Cell>* cells){
       }
       cells->push_back(cell);
     }
+  }
+  if(cells->size()==0){
+    Cell cell;
+    cell.expo = 1;
+    cell.value = N;
+    cells->push_back(cell);
   }
 
 }
