@@ -1,5 +1,6 @@
 #include "gpu.hpp"
 
+#include "utils/common.hpp"
 
 
 __global__ void isPrimeGPUV1(const ULONGLONG N,int*isPrime){
@@ -53,17 +54,17 @@ __global__ void searchPrimesGPUV1(const ULONGLONG N,char* primes){
 
 __host__ vector<ULONGLONG> searchPrimesGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU){
   vector<ULONGLONG> out = {2};
-  int nbArrEl = N/2 + 1;
-  int sizeArr = sizeof(char)*nbArrEl;
+  ULONGLONG nbArrEl = sqrt(N)/2 + 1;
+  ULONGLONG sizeArr = sizeof(char)*nbArrEl;
   char* isPrimeArr_dev;
   char* isPrimeArr = (char*) malloc(sizeArr);
-  cudaMalloc(&isPrimeArr_dev,sizeArr);
+  HANDLE_ERROR(cudaMalloc(&isPrimeArr_dev,sizeArr));
   int threads = NB_THREADS;
   int blocks = (nbArrEl+NB_THREADS-1)/NB_THREADS;
   (*chrGPU).start();
   searchPrimesGPUV1<<<blocks,threads>>>(nbArrEl,isPrimeArr_dev);
   (*chrGPU).stop();
-  cudaMemcpy(isPrimeArr,isPrimeArr_dev ,sizeArr, cudaMemcpyDeviceToHost);
+  HANDLE_ERROR(cudaMemcpy(isPrimeArr,isPrimeArr_dev ,sizeArr, cudaMemcpyDeviceToHost));
   cudaFree(isPrimeArr_dev);
   for(ULONGLONG x=0;x<nbArrEl;x++){
     if(!isPrimeArr[x]){
@@ -81,7 +82,7 @@ __global__ void FactorizationGPUV1(const ULONGLONG N,const ULONGLONG* primes,con
     if(global_id>primesSize)
       return;
     ULONGLONG val = primes[global_id];
-    if(N%val){
+    if(N%val==0){
         char coef =0;
         ULONGLONG tmp = N;
         while(tmp%val==0){
@@ -97,19 +98,26 @@ __global__ void FactorizationGPUV1(const ULONGLONG N,const ULONGLONG* primes,con
 __host__ void FactorizationGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU,vector<ULONGLONG>* primes,vector<Cell> *cells){
   ULONGLONG* primeArr_dev;
   int nbArrEl = primes->size();
-  int sizeArr = sizeof(char)*nbArrEl;
+  int sizePrimesArr = nbArrEl*sizeof(ULONGLONG);
+  ULONGLONG* primesArr = (ULONGLONG*)malloc(sizePrimesArr);
+  int sizeCoefsArr = sizeof(char)*nbArrEl;
   char* coefs_devs;
-  char* coefs = (char*)malloc(sizeArr);
-  cudaMalloc(&coefs_devs,sizeArr);
-  cudaMalloc(&primeArr_dev,sizeof(ULONGLONG)*nbArrEl);
-  cudaMemcpy(primeArr_dev,&primes[0] ,sizeof(ULONGLONG)*nbArrEl, cudaMemcpyHostToDevice);
+  char* coefs = (char*)malloc(sizeCoefsArr);
+
+
+  copy(primes->begin(), primes->end(), primesArr);
+  HANDLE_ERROR(cudaMalloc(&coefs_devs,sizeCoefsArr));
+  HANDLE_ERROR(cudaMalloc(&primeArr_dev,sizePrimesArr));
+  HANDLE_ERROR(cudaMemcpy(primeArr_dev,primesArr ,sizePrimesArr, cudaMemcpyHostToDevice));
   int threads = NB_THREADS;
   int blocks = (nbArrEl+NB_THREADS-1)/NB_THREADS;
-  (*chrGPU).start();
+  //(*chrGPU).start();
   FactorizationGPUV1<<<blocks,threads>>>(N,primeArr_dev,nbArrEl,coefs_devs);
-  (*chrGPU).stop();
-  cudaMemcpy(coefs,coefs_devs ,sizeof(char)*nbArrEl, cudaMemcpyDeviceToHost);
-  for(int i =0;i<nbArrEl;i++){
+  //(*chrGPU).stop();
+  HANDLE_ERROR(cudaMemcpy(coefs,coefs_devs ,sizeCoefsArr, cudaMemcpyDeviceToHost));
+  HANDLE_ERROR(cudaFree(primeArr_dev));
+  HANDLE_ERROR(cudaFree(coefs_devs));
+  for(int i = 0;i<nbArrEl;i++){
     if(coefs[i]>0){
       Cell cell;
       cell.expo = coefs[i];
@@ -121,6 +129,18 @@ __host__ void FactorizationGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU,vect
     Cell cell;
     cell.expo = 1;
     cell.value = N;
+    cells->push_back(cell);
+  }
+  ULONGLONG tmp = N;
+  for(int j=0;j<cells->size();j++){
+      Cell c = cells->at(j);
+      for(int i =0;i<c.expo;i++)
+        tmp/=c.value;
+  }
+  if(tmp!=0 && tmp!=1){
+    Cell cell;
+    cell.expo=1;
+    cell.value=tmp;
     cells->push_back(cell);
   }
 }
