@@ -1,1 +1,1 @@
-nvcc main.cu cpu.cpp gpu.cu utils\chronoGPU.cu utils\chronoCPU.cpp
+nvcc -o prog main.cu cpu.cpp gpu.cu utils\chronoGPU.cu utils\chronoCPU.cpp
