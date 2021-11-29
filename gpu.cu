@@ -5,16 +5,17 @@
 __global__ void isPrimeGPUV1(const ULONGLONG N,int*isPrime){
   __shared__ int s_isPrime[1];
   ULONGLONG global_id = blockDim.x*blockIdx.x +threadIdx.x;
-  if(threadIdx.x==0){
+  ULONGLONG val = global_id*2+3;
+  if(threadIdx.x==0 && (N%2 != 0 || N == 2)){
     s_isPrime[0]=1;
   }
   __syncthreads();
-  while( (global_id%2==1 || global_id==2) && s_isPrime[0]==1 && global_id*global_id<=N){
-    if(N%global_id==0 && global_id>1 ){
+  while(s_isPrime[0]==1 && val*val<=N){
+    if(N%val==0){
         s_isPrime[0] = 0;
         break;
     }
-    global_id+=blockDim.x*gridDim.x;
+    val+=(blockDim.x*gridDim.x)*2;
   }
   __syncthreads();
   if(threadIdx.x==0 && s_isPrime[0]==0){
@@ -52,7 +53,7 @@ __global__ void searchPrimesGPUV1(const ULONGLONG N,char* primes){
 
 __host__ vector<ULONGLONG> searchPrimesGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU){
   vector<ULONGLONG> out = {2};
-  int nbArrEl = sqrt(N)/2 + 1;
+  int nbArrEl = N/2 + 1;
   int sizeArr = sizeof(char)*nbArrEl;
   char* isPrimeArr_dev;
   char* isPrimeArr = (char*) malloc(sizeArr);
