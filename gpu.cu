@@ -77,8 +77,6 @@ __host__ vector<ULONGLONG> searchPrimesGPUV1Launcher(const ULONGLONG N,ChronoGPU
 
 __global__ void FactorizationGPUV1(const ULONGLONG N,const ULONGLONG* primes,const ULONGLONG primesSize,char* coefs){
     ULONGLONG global_id = blockIdx.x*blockDim.x +threadIdx.x;
-    __shared__ char s_coefs[NB_THREADS];
-    s_coefs[global_id]=0;
     if(global_id>primesSize)
       return;
     ULONGLONG val = primes[global_id];
@@ -89,9 +87,8 @@ __global__ void FactorizationGPUV1(const ULONGLONG N,const ULONGLONG* primes,con
           coef++;
           tmp/=val;
         }
-        s_coefs[global_id]=coef;
+        coefs[global_id]=coef;
     }
-    coefs[global_id]=s_coefs[global_id];
 
 }
 
@@ -111,9 +108,9 @@ __host__ void FactorizationGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU,vect
   HANDLE_ERROR(cudaMemcpy(primeArr_dev,primesArr ,sizePrimesArr, cudaMemcpyHostToDevice));
   int threads = NB_THREADS;
   int blocks = (nbArrEl+NB_THREADS-1)/NB_THREADS;
-  //(*chrGPU).start();
+  (*chrGPU).start();
   FactorizationGPUV1<<<blocks,threads>>>(N,primeArr_dev,nbArrEl,coefs_devs);
-  //(*chrGPU).stop();
+  (*chrGPU).stop();
   HANDLE_ERROR(cudaMemcpy(coefs,coefs_devs ,sizeCoefsArr, cudaMemcpyDeviceToHost));
   HANDLE_ERROR(cudaFree(primeArr_dev));
   HANDLE_ERROR(cudaFree(coefs_devs));
