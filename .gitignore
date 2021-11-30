@@ -2,3 +2,6 @@
 a.exe
 a.exp
 a.lib
+*.exe
+*.exp
+prog.lib
