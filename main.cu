@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-#include "utils\chronoCPU.hpp"
-#include "utils\chronoGPU.hpp"
+#include "utils/chronoCPU.hpp"
+#include "utils/chronoGPU.hpp"
 
 
 #include "cpu.hpp"

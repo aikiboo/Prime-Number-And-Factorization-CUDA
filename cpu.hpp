@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <vector>
-#include "utils\chronoCPU.hpp"
+#include "utils/chronoCPU.hpp"
 #include "commun.hpp"
 using namespace std;
 
