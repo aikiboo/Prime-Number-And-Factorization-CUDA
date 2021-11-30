@@ -27,7 +27,7 @@ bool isPrimeCPUV2(const ULONGLONG N,vector<ULONGLONG> &v){
 
 vector<ULONGLONG> searchPrimesCPUV1(const ULONGLONG N){
   std::vector<ULONGLONG> out = {2};
-  for(ULONGLONG i=3;i<=N;i++){
+  for(ULONGLONG i=3;i<=sqrt(N);i++){
     bool isPrime = true;
     for(ULONGLONG x : out){
         if(i%x == 0){
@@ -71,6 +71,18 @@ void factoCPU(ULONGLONG N,vector<ULONGLONG>* v,vector<Cell>* cells){
     Cell cell;
     cell.expo = 1;
     cell.value = N;
+    cells->push_back(cell);
+  }
+  tmp = N;
+  for(int j=0;j<cells->size();j++){
+      Cell c = cells->at(j);
+      for(int i =0;i<c.expo;i++)
+        tmp/=c.value;
+  }
+  if(tmp!=0 && tmp!=1){
+    Cell cell;
+    cell.expo=1;
+    cell.value=tmp;
     cells->push_back(cell);
   }
 

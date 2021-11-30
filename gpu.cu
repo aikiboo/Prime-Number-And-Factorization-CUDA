@@ -32,7 +32,7 @@ __host__ bool isPrimeGPUlancherV1(const ULONGLONG N,ChronoGPU*chrGPU ){
   int threads = NB_THREADS;
   int blocks = (sqrt(N)+NB_THREADS-1)/NB_THREADS;
   (*chrGPU).start();
-  isPrimeGPUV1<<<1,threads>>>(N,isPrimeArr);
+  isPrimeGPUV1<<<blocks,threads>>>(N,isPrimeArr);
   (*chrGPU).stop();
   cudaMemcpy(isPrime,isPrimeArr ,sizeof(bool), cudaMemcpyDeviceToHost);
   cudaFree(isPrimeArr);
@@ -41,15 +41,15 @@ __host__ bool isPrimeGPUlancherV1(const ULONGLONG N,ChronoGPU*chrGPU ){
 
 __global__ void searchPrimesGPUV1(const ULONGLONG N,char* primes){
   ULONGLONG global_id = blockIdx.x*blockDim.x +threadIdx.x;
-  ULONGLONG val = (global_id*2)+3;
-  if(global_id>N)
-    return;
-  if(primes[global_id]==0){
-    for(ULONGLONG x=global_id+val;x<N;x+=val){
-      primes[x]=1;
+  while(global_id<N){
+    ULONGLONG val = (global_id*2)+3;
+    if(primes[global_id]==0){
+      for(ULONGLONG x=global_id+val;x<N;x+=val){
+        primes[x]=1;
+      }
     }
+    global_id+=blockDim.x*gridDim.x;
   }
-
 }
 
 __host__ vector<ULONGLONG> searchPrimesGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU){
@@ -77,19 +77,20 @@ __host__ vector<ULONGLONG> searchPrimesGPUV1Launcher(const ULONGLONG N,ChronoGPU
 
 __global__ void FactorizationGPUV1(const ULONGLONG N,const ULONGLONG* primes,const ULONGLONG primesSize,char* coefs){
     ULONGLONG global_id = blockIdx.x*blockDim.x +threadIdx.x;
-    if(global_id>primesSize)
-      return;
-    ULONGLONG val = primes[global_id];
-    if(N%val==0){
-        char coef =0;
-        ULONGLONG tmp = N;
-        while(tmp%val==0){
-          coef++;
-          tmp/=val;
-        }
-        coefs[global_id]=coef;
-    }
 
+    while(global_id<primesSize){
+      ULONGLONG val = primes[global_id];
+      if(N%val==0){
+          char coef =0;
+          ULONGLONG tmp = N;
+          while(tmp%val==0){
+            coef++;
+            tmp/=val;
+          }
+          coefs[global_id]=coef;
+      }
+      global_id+=blockDim.x*gridDim.x;
+    }
 }
 
 __host__ void FactorizationGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU,vector<ULONGLONG>* primes,vector<Cell> *cells){
