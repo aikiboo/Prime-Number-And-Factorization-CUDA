@@ -4,23 +4,23 @@
 
 
 __global__ void isPrimeGPUV1(const ULONGLONG N,int*isPrime){
-  __shared__ int s_isPrime[1];
-  ULONGLONG global_id = blockDim.x*blockIdx.x +threadIdx.x;
-  ULONGLONG val = global_id*2+3;
+  __shared__ int s_isPrime;
   if(threadIdx.x==0 && (N%2 != 0 || N == 2)){
-    s_isPrime[0]=1;
+    s_isPrime = 1;
   }
   __syncthreads();
-  while(s_isPrime[0]==1 && val*val<=N){
+  ULONGLONG global_id = blockDim.x*blockIdx.x +threadIdx.x;
+  ULONGLONG val = global_id*2+3;
+  while(s_isPrime  ==1 && val*val<=N){
     if(N%val==0){
-        s_isPrime[0] = 0;
+        s_isPrime = 0;
         break;
     }
     val+=(blockDim.x*gridDim.x)*2;
   }
   __syncthreads();
-  if(threadIdx.x==0 && s_isPrime[0]==0){
-    isPrime[0]=s_isPrime[0];
+  if(threadIdx.x==0 && s_isPrime ==0){
+    isPrime[0]=s_isPrime ;
   }
 }
 
@@ -30,7 +30,7 @@ __host__ bool isPrimeGPUlancherV1(const ULONGLONG N,ChronoGPU*chrGPU ){
   cudaMalloc(&isPrimeArr,sizeof(int));
   cudaMemcpy(isPrimeArr,isPrime,sizeof(int),cudaMemcpyHostToDevice);
   int threads = NB_THREADS;
-  int blocks = (sqrt(N)+NB_THREADS-1)/NB_THREADS;
+  int blocks = (sqrt(N)*0.5+NB_THREADS-1)/NB_THREADS;
   (*chrGPU).start();
   isPrimeGPUV1<<<blocks,threads>>>(N,isPrimeArr);
   (*chrGPU).stop();
