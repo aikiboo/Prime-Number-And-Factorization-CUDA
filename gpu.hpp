@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
-#include "utils/chronoGPU.hpp"
+#include "utils\chronoGPU.hpp"
 #include "commun.hpp"
 #endif
 using namespace std;
