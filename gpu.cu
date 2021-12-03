@@ -11,7 +11,7 @@ __global__ void isPrimeGPUV1(const ULONGLONG N,int*isPrime){
   __syncthreads();
   ULONGLONG global_id = blockDim.x*blockIdx.x +threadIdx.x;
   ULONGLONG val = global_id*2+3;
-  while(s_isPrime  ==1 && val*val<=N){
+  while(s_isPrime  == 1 && val*val<=N){
     if(N%val==0){
         s_isPrime = 0;
         break;
@@ -38,6 +38,56 @@ __host__ bool isPrimeGPUlancherV1(const ULONGLONG N,ChronoGPU*chrGPU ){
   cudaFree(isPrimeArr);
   return isPrime[0];
 }
+
+
+__global__ void isPrimeGPUV2(const ULONGLONG N,const ULONGLONG*primes,const int primesLen,char*isPrime){
+  __shared__ int s_isPrime;
+  if(threadIdx.x==0){
+    s_isPrime = 1;
+  }
+  __syncthreads();
+  ULONGLONG global_id = blockDim.x*blockIdx.x +threadIdx.x;
+  while(s_isPrime == 1 && global_id<primesLen && primes[global_id]){
+    if(N%primes[global_id]==0){
+      s_isPrime = 0;
+      break;
+    }
+    global_id+=blockDim.x*gridDim.x;
+  }
+  __syncthreads();
+  if(threadIdx.x==0 && s_isPrime ==0){
+    isPrime[0]=s_isPrime ;
+  }
+}
+
+__host__ bool isPrimeGPUlancherV2(const ULONGLONG N,vector<ULONGLONG>* v,ChronoGPU* chrGPU){
+  //tableau pour le booléen de primalité
+  char* isPrimeArr;
+  char isPrime[1] = {1};
+  cudaMalloc(&isPrimeArr,sizeof(char));
+  cudaMemcpy(isPrimeArr,isPrime,sizeof(char),cudaMemcpyHostToDevice);
+  //tableau de premiers
+  ULONGLONG* primeArr_dev;
+  int nbArrEl = v->size();
+  int sizePrimesArr = nbArrEl*sizeof(ULONGLONG);
+  ULONGLONG* primesArr = (ULONGLONG*)malloc(sizePrimesArr);
+  copy(v->begin(), v->end(), primesArr);
+  HANDLE_ERROR(cudaMalloc(&primeArr_dev,sizePrimesArr));
+  HANDLE_ERROR(cudaMemcpy(primeArr_dev,primesArr ,sizePrimesArr, cudaMemcpyHostToDevice));
+
+  int threads = NB_THREADS;
+  int blocks = (nbArrEl+NB_THREADS-1)/NB_THREADS;
+  (*chrGPU).start();
+  isPrimeGPUV2<<<blocks,threads>>>(N,primeArr_dev,nbArrEl,isPrimeArr);
+  (*chrGPU).stop();
+  cudaMemcpy(isPrime,isPrimeArr ,sizeof(bool), cudaMemcpyDeviceToHost);
+  cudaFree(isPrimeArr);
+  return isPrime[0];
+}
+
+
+
+
 
 __global__ void searchPrimesGPUV1(const ULONGLONG N,char* primes){
   ULONGLONG global_id = blockIdx.x*blockDim.x +threadIdx.x;

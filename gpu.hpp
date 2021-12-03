@@ -11,9 +11,13 @@ using namespace std;
 #define NB_THREADS 1024
 
 
-__global__ void isPrimeGPU(const ULONGLONG N,int*isPrime);
+__global__ void isPrimeGPUV1(const ULONGLONG N,int*isPrime);
 
 __host__ bool isPrimeGPUlancherV1(const ULONGLONG N,ChronoGPU*chrGPU);
+
+__global__ void isPrimeGPUV2(const ULONGLONG N,int*isPrime);
+
+__host__ bool isPrimeGPUlancherV2(const ULONGLONG N,vector<ULONGLONG>* v,ChronoGPU*chrGPU);
 
 __global__ void searchPrimesGPUV1(const ULONGLONG N,const char* primes);
 

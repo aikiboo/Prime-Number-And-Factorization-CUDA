@@ -1,15 +1,23 @@
 
 #include "cpu.hpp"
 
-bool isPrimeCPUV1(const ULONGLONG N,ChronoCPU*chrCPU){
-  (*chrCPU).start();
-  for(ULONGLONG i = 2;i<=sqrt(N);i++){
-    if(N%i==0){
-      (*chrCPU).stop();
+bool isPrimeCPUV0(const ULONGLONG N){
+  for(ULONGLONG i = 2;i<N;i++){
+    if(N%i==0)
+      return false;
+  }
+  return true;
+}
+
+bool isPrimeCPUV1(const ULONGLONG N){
+  //On précalcule la racine carré de N afin de ne pas la recalculer
+  //à chaque itération
+  double root = sqrt(N);
+  for(ULONGLONG i = 2;i<=root;i++){
+    if(N%2==1 && N%i==0){
       return false;
     }
   }
-  (*chrCPU).stop();
   return true;
 }
 

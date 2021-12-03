@@ -23,9 +23,16 @@ void processAndDisplayCPU(ULONGLONG N){
   cout<<"======================================"<<endl;
   cout<<"Test de primalité de "<<N<<endl;
   //Test N is prime
-  isPrime = isPrimeCPUV1(N,&chrCPU);
+  chrCPU.start();
+  isPrime = isPrimeCPUV0(N);
+  chrCPU.stop();
   timeCPU = chrCPU.elapsedTime();
-  cout<<"--> Temps du test de primalité : "<<timeCPU<<" ms"<<endl;
+  cout<<"--> Temps du test V0 de primalité : "<<timeCPU<<" ms"<<endl;
+  chrCPU.start();
+  isPrime = isPrimeCPUV1(N);
+  chrCPU.stop();
+  timeCPU = chrCPU.elapsedTime();
+  cout<<"--> Temps du test V1 de primalité : "<<timeCPU<<" ms"<<endl;
   cout<<"Est premier ? "<<(isPrime?"Oui":"Non")<<endl;
   cout<<"Recherche des nombres premiers"<<endl;
   //Find all prime < N
@@ -62,11 +69,15 @@ void processAndDisplayGPU(ULONGLONG N){
   cout<<"Test de primalité de "<<N<<endl;
   isPrime = isPrimeGPUlancherV1(N,&chrGPU);
   timeGPU = chrGPU.elapsedTime();
-  cout<<"--> Temps du test de primalité : "<<timeGPU<<" ms"<<endl;
+  cout<<"--> Temps du test de primalité V1: "<<timeGPU<<" ms"<<endl;
   cout<<"Est premier ? "<<(isPrime?"Oui":"Non")<<endl;
   v = searchPrimesGPUV1Launcher(N,&chrGPU);
   timeGPU = chrGPU.elapsedTime();
   cout<<"--> Temps de recherche : "<<timeGPU<<" ms"<<endl;
+
+  isPrime = isPrimeGPUlancherV2(N,&v,&chrGPU);
+  timeGPU = chrGPU.elapsedTime();
+  cout<<"--> Temps du test de primalité V2: "<<timeGPU<<" ms"<<endl;
   vector<Cell> cells_gpu ={};
   FactorizationGPUV1Launcher(N,&chrGPU,&v,&cells_gpu);
   timeGPU = chrGPU.elapsedTime();

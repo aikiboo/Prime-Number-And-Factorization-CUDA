@@ -7,8 +7,8 @@
 using namespace std;
 
 
-
-bool isPrimeCPUV1(const ULONGLONG N,ChronoCPU*chrCPU);
+bool isPrimeCPUV0(const ULONGLONG N);
+bool isPrimeCPUV1(const ULONGLONG N);
 bool isPrimeCPUV2(const ULONGLONG N,vector<ULONGLONG> &v);
 vector<ULONGLONG> searchPrimesCPUV1(const ULONGLONG N);
 vector<ULONGLONG> searchPrimesCPUV2(const ULONGLONG N);
