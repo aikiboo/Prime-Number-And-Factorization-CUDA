@@ -14,7 +14,7 @@ bool isPrimeCPUV1(const ULONGLONG N){
   //à chaque itération
   double root = sqrt(N);
   for(ULONGLONG i = 2;i<=root;i++){
-    if(N%2==1 && N%i==0){
+    if( (i%2==1||i==2) && N%i==0){
       return false;
     }
   }

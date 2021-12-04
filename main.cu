@@ -28,6 +28,7 @@ void processAndDisplayCPU(ULONGLONG N){
   chrCPU.stop();
   timeCPU = chrCPU.elapsedTime();
   cout<<"--> Temps du test V0 de primalité : "<<timeCPU<<" ms"<<endl;
+  cout<<"Est premier ? "<<(isPrime?"Oui":"Non")<<endl;
   chrCPU.start();
   isPrime = isPrimeCPUV1(N);
   chrCPU.stop();
