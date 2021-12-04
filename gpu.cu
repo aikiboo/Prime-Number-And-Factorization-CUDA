@@ -150,13 +150,12 @@ __host__ void FactorizationGPUV1Launcher(const ULONGLONG N,ChronoGPU*chrGPU,vect
   ULONGLONG* primesArr = (ULONGLONG*)malloc(sizePrimesArr);
   int sizeCoefsArr = sizeof(char)*nbArrEl;
   char* coefs_devs;
-  char* coefs = (char*)malloc(sizeCoefsArr);
-
-
+  char* coefs = (char*)calloc(nbArrEl,sizeof(char));
   copy(primes->begin(), primes->end(), primesArr);
   HANDLE_ERROR(cudaMalloc(&coefs_devs,sizeCoefsArr));
   HANDLE_ERROR(cudaMalloc(&primeArr_dev,sizePrimesArr));
   HANDLE_ERROR(cudaMemcpy(primeArr_dev,primesArr ,sizePrimesArr, cudaMemcpyHostToDevice));
+  HANDLE_ERROR(cudaMemcpy(coefs_devs,coefs ,sizeCoefsArr, cudaMemcpyHostToDevice));
   int threads = NB_THREADS;
   int blocks = (nbArrEl+NB_THREADS-1)/NB_THREADS;
   (*chrGPU).start();
